@@ -200,25 +200,27 @@ class Shape:
         points = []
         for i in range(10):
             angle = i * math.pi / 5
-            radius = size if i % 2 == 0 else size // 2
+            radius = size if i % 2 == 0 else max(1, size // 2)  # Ensure radius is never zero
             points.append((x + radius * math.cos(angle), y + radius * math.sin(angle)))
         pygame.draw.polygon(surface, self.color, points)
     
     def draw_heart(self, surface, x, y, size):
         """Draw a heart shape."""
         points = []
+        scale_factor = max(1, size // 16)  # Ensure scale factor is never zero
         for t in range(0, 360, 5):
             angle = math.radians(t)
             px = 16 * math.sin(angle) ** 3
             py = -(13 * math.cos(angle) - 5 * math.cos(2*angle) - 2 * math.cos(3*angle) - math.cos(4*angle))
-            points.append((x + px * size // 16, y + py * size // 16))
+            points.append((x + px * scale_factor, y + py * scale_factor))
         if len(points) > 2:
             pygame.draw.polygon(surface, self.color, points)
     
     def draw_cross(self, surface, x, y, size):
         """Draw a cross shape."""
-        pygame.draw.line(surface, self.color, (x - size, y), (x + size, y), size // 4)
-        pygame.draw.line(surface, self.color, (x, y - size), (x, y + size), size // 4)
+        line_thickness = max(1, size // 4)  # Ensure line thickness is never zero
+        pygame.draw.line(surface, self.color, (x - size, y), (x + size, y), line_thickness)
+        pygame.draw.line(surface, self.color, (x, y - size), (x, y + size), line_thickness)
     
     def draw_spiral(self, surface, x, y, size):
         """Draw a spiral shape."""
@@ -233,8 +235,9 @@ class Shape:
     def draw_wave(self, surface, x, y, size):
         """Draw a wave pattern."""
         points = []
+        wave_amplitude = max(1, size // 3)  # Ensure wave amplitude is never zero
         for i in range(-size, size, 5):
-            wave_y = y + math.sin(i * 0.1) * size // 3
+            wave_y = y + math.sin(i * 0.1) * wave_amplitude
             points.append((x + i, wave_y))
         if len(points) > 1:
             pygame.draw.lines(surface, self.color, False, points, 3)
@@ -242,8 +245,10 @@ class Shape:
     def draw_zigzag(self, surface, x, y, size):
         """Draw a zigzag pattern."""
         points = []
-        for i in range(-size, size, size // 4):
-            zig_y = y + (size // 4) if (i // (size // 4)) % 2 == 0 else y - (size // 4)
+        step = max(1, size // 4)  # Ensure step is never zero
+        zigzag_amplitude = max(1, size // 4)  # Ensure zigzag amplitude is never zero
+        for i in range(-size, size, step):
+            zig_y = y + zigzag_amplitude if (i // step) % 2 == 0 else y - zigzag_amplitude
             points.append((x + i, zig_y))
         if len(points) > 1:
             pygame.draw.lines(surface, self.color, False, points, 3)
@@ -253,7 +258,8 @@ class Shape:
         for i in range(5):
             dot_x = x + random.randint(-size, size)
             dot_y = y + random.randint(-size, size)
-            pygame.draw.circle(surface, self.color, (dot_x, dot_y), size // 5)
+            dot_radius = max(1, size // 5)  # Ensure radius is never zero
+            pygame.draw.circle(surface, self.color, (dot_x, dot_y), dot_radius)
     
     def draw_lines(self, surface, x, y, size):
         """Draw multiple lines."""
@@ -283,31 +289,38 @@ class Shape:
     def draw_bubble(self, surface, x, y, size):
         """Draw a bubble with highlight."""
         pygame.draw.circle(surface, self.color, (x, y), size)
-        pygame.draw.circle(surface, (255, 255, 255), (x - size//3, y - size//3), size//4)
+        highlight_size = max(1, size // 4)  # Ensure highlight size is never zero
+        highlight_offset = max(1, size // 3)  # Ensure offset is never zero
+        pygame.draw.circle(surface, (255, 255, 255), (x - highlight_offset, y - highlight_offset), highlight_size)
     
     def draw_flower(self, surface, x, y, size):
         """Draw a flower with petals."""
+        petal_size = max(1, size // 3)  # Ensure petal size is never zero
+        center_size = max(1, size // 4)  # Ensure center size is never zero
         for i in range(6):
             angle = i * math.pi / 3
             petal_x = x + size//2 * math.cos(angle)
             petal_y = y + size//2 * math.sin(angle)
-            pygame.draw.circle(surface, self.color, (int(petal_x), int(petal_y)), size//3)
-        pygame.draw.circle(surface, (255, 255, 0), (x, y), size//4)
+            pygame.draw.circle(surface, self.color, (int(petal_x), int(petal_y)), petal_size)
+        pygame.draw.circle(surface, (255, 255, 0), (x, y), center_size)
     
     def draw_butterfly(self, surface, x, y, size):
         """Draw a butterfly shape."""
+        half_size = max(1, size // 2)  # Ensure half size is never zero
         # Left wing
-        points_left = [(x, y), (x - size, y - size//2), (x - size//2, y - size)]
+        points_left = [(x, y), (x - size, y - half_size), (x - half_size, y - size)]
         pygame.draw.polygon(surface, self.color, points_left)
         # Right wing
-        points_right = [(x, y), (x + size, y - size//2), (x + size//2, y - size)]
+        points_right = [(x, y), (x + size, y - half_size), (x + half_size, y - size)]
         pygame.draw.polygon(surface, self.color, points_right)
     
     def draw_rocket(self, surface, x, y, size):
         """Draw a rocket shape."""
-        points = [(x, y - size), (x - size//2, y + size//2), (x + size//2, y + size//2)]
+        half_size = max(1, size // 2)  # Ensure half size is never zero
+        quarter_size = max(1, size // 4)  # Ensure quarter size is never zero
+        points = [(x, y - size), (x - half_size, y + half_size), (x + half_size, y + half_size)]
         pygame.draw.polygon(surface, self.color, points)
-        pygame.draw.rect(surface, (255, 255, 255), (x - size//4, y, size//2, size//2))
+        pygame.draw.rect(surface, (255, 255, 255), (x - quarter_size, y, half_size, half_size))
     
     def draw_rainbow(self, surface, x, y, size):
         """Draw a rainbow arc."""
@@ -320,22 +333,26 @@ class Shape:
     def draw_sun(self, surface, x, y, size):
         """Draw a sun with rays."""
         pygame.draw.circle(surface, (255, 255, 0), (x, y), size)
+        half_size = max(1, size // 2)  # Ensure half size is never zero
         for i in range(8):
             angle = i * math.pi / 4
-            ray_x = x + (size + size//2) * math.cos(angle)
-            ray_y = y + (size + size//2) * math.sin(angle)
+            ray_x = x + (size + half_size) * math.cos(angle)
+            ray_y = y + (size + half_size) * math.sin(angle)
             pygame.draw.line(surface, (255, 255, 0), (x, y), (ray_x, ray_y), 3)
     
     def draw_moon(self, surface, x, y, size):
         """Draw a crescent moon."""
         pygame.draw.circle(surface, (255, 255, 255), (x, y), size)
-        pygame.draw.circle(surface, (0, 0, 0), (x + size//3, y), size)
+        third_size = max(1, size // 3)  # Ensure third size is never zero
+        pygame.draw.circle(surface, (0, 0, 0), (x + third_size, y), size)
     
     def draw_cloud(self, surface, x, y, size):
         """Draw a cloud shape."""
-        pygame.draw.circle(surface, (255, 255, 255), (x - size//2, y), size//2)
-        pygame.draw.circle(surface, (255, 255, 255), (x + size//2, y), size//2)
-        pygame.draw.circle(surface, (255, 255, 255), (x, y - size//3), size//2)
+        half_size = max(1, size // 2)  # Ensure half size is never zero
+        third_size = max(1, size // 3)  # Ensure third size is never zero
+        pygame.draw.circle(surface, (255, 255, 255), (x - half_size, y), half_size)
+        pygame.draw.circle(surface, (255, 255, 255), (x + half_size, y), half_size)
+        pygame.draw.circle(surface, (255, 255, 255), (x, y - third_size), half_size)
     
     def draw_explosion(self, surface, x, y, size):
         """Draw an explosion effect."""
@@ -360,13 +377,16 @@ class Shape:
             if alpha > 0:
                 color_with_alpha = (*self.color, alpha)
                 fade_surface = pygame.Surface((size * 2, size * 2), pygame.SRCALPHA)
-                pygame.draw.circle(fade_surface, color_with_alpha, (size, size), size - i * size//5)
+                fade_radius = max(1, size - i * size//5)  # Ensure radius is never zero
+                pygame.draw.circle(fade_surface, color_with_alpha, (size, size), fade_radius)
                 surface.blit(fade_surface, (0, 0))
     
     def draw_shimmer(self, surface, x, y, size):
         """Draw a shimmer effect."""
+        half_size = max(1, size // 2)  # Ensure half size is never zero
+        sixth_size = max(1, size // 6)  # Ensure sixth size is never zero
         for i in range(4):
             angle = i * math.pi / 2 + pygame.time.get_ticks() * 0.01
-            shimmer_x = x + size//2 * math.cos(angle)
-            shimmer_y = y + size//2 * math.sin(angle)
-            pygame.draw.circle(surface, (255, 255, 255), (int(shimmer_x), int(shimmer_y)), size//6)
+            shimmer_x = x + half_size * math.cos(angle)
+            shimmer_y = y + half_size * math.sin(angle)
+            pygame.draw.circle(surface, (255, 255, 255), (int(shimmer_x), int(shimmer_y)), sixth_size)

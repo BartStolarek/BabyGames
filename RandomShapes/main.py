@@ -33,26 +33,30 @@ class BabyGame:
         print("🎮 Baby Games started! Press any key to create shapes!")
         print("💡 Press Ctrl+Shift+C to exit the game")
         
-        while self.running:
-            # Handle events
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.running = False
-                elif event.type == pygame.KEYDOWN:
-                    self.handle_key_press(event)
-            
-            # Update animations and shapes
-            self.animation_manager.update()
-            self.shape_manager.update()
-            
-            # Render everything
-            self.display.clear()
-            self.shape_manager.draw(self.display.screen)
-            self.animation_manager.draw_particles(self.display.screen)
-            self.display.update()
-            
-            # Cap the frame rate
-            self.clock.tick(60)
+        try:
+            while self.running:
+                # Handle events
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self.running = False
+                    elif event.type == pygame.KEYDOWN:
+                        self.handle_key_press(event)
+                
+                # Update animations and shapes
+                self.animation_manager.update()
+                self.shape_manager.update()
+                
+                # Render everything
+                self.display.clear()
+                self.shape_manager.draw(self.display.screen)
+                self.animation_manager.draw_particles(self.display.screen)
+                self.display.update()
+                
+                # Cap the frame rate
+                self.clock.tick(60)
+        finally:
+            # Clean up resources
+            self.shape_manager.cleanup()
         
         pygame.quit()
         sys.exit()

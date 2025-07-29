@@ -7,6 +7,8 @@ import random
 import pygame
 from shapes import Shape
 from input_handler import InputHandler
+from sound_manager import SoundManager
+from particle_system import ParticleSystem
 
 
 class ShapeManager:
@@ -14,7 +16,9 @@ class ShapeManager:
         """Initialize the shape manager."""
         self.shapes = []
         self.input_handler = InputHandler()
-        self.max_shapes = 50  # Limit to prevent performance issues
+        self.sound_manager = SoundManager()
+        self.particle_system = ParticleSystem()
+        self.max_shapes = 10  # Limit to 10 shapes as requested
         self.shape_lifetime = 10000  # 10 seconds in milliseconds
         self.screen_width = 1920  # Default, will be updated
         self.screen_height = 1080  # Default, will be updated
@@ -42,30 +46,69 @@ class ShapeManager:
         # Create the shape
         shape = Shape(shape_type, color_name, x, y, size)
         
+        # Check if we need to remove the oldest shape before adding new one
+        if len(self.shapes) >= self.max_shapes:
+            print(f"🎯 Shape limit reached ({self.max_shapes})! Removing oldest shape...")
+            self.remove_oldest_shape_with_pop()
+        
         # Add to shapes list
         self.shapes.append(shape)
         
-        # Clean up old shapes if we have too many
-        self.cleanup_old_shapes()
+        # Debug info
+        print(f"✨ Created {shape.shape_type} with color {shape.color_name}! Total shapes: {len(self.shapes)}")
+        
+        # Play a baby-friendly sound
+        self.sound_manager.play_shape_sound()
         
         return shape
     
+    def remove_oldest_shape_with_pop(self):
+        """Remove the oldest shape with a popping animation."""
+        if not self.shapes:
+            return
+            
+        # Find the oldest shape
+        oldest_shape = min(self.shapes, key=lambda s: s.creation_time)
+        
+        # Create popping effect at the shape's position
+        self.particle_system.create_pop_effect(
+            oldest_shape.x, 
+            oldest_shape.y, 
+            oldest_shape.color,
+            num_particles=20
+        )
+        
+        # Remove the oldest shape
+        self.shapes.remove(oldest_shape)
+        
+        # Debug info
+        print(f"💥 Popped oldest {oldest_shape.shape_type} at ({oldest_shape.x:.0f}, {oldest_shape.y:.0f})! Shapes remaining: {len(self.shapes)}")
+        
+        # Play a pop sound (if available)
+        # self.sound_manager.play_pop_sound()  # Uncomment if you add this method
+    
     def cleanup_old_shapes(self):
-        """Remove shapes that are too old or if we have too many."""
+        """Remove shapes that are too old."""
         current_time = pygame.time.get_ticks()
         
         # Remove shapes older than lifetime
-        self.shapes = [shape for shape in self.shapes 
-                      if current_time - shape.creation_time < self.shape_lifetime]
+        shapes_to_remove = []
+        for shape in self.shapes:
+            if current_time - shape.creation_time >= self.shape_lifetime:
+                shapes_to_remove.append(shape)
         
-        # If still too many shapes, remove oldest ones
-        if len(self.shapes) > self.max_shapes:
-            # Sort by creation time and keep only the newest ones
-            self.shapes.sort(key=lambda s: s.creation_time, reverse=True)
-            self.shapes = self.shapes[:self.max_shapes]
+        # Remove old shapes with pop effect
+        for shape in shapes_to_remove:
+            self.particle_system.create_pop_effect(
+                shape.x, 
+                shape.y, 
+                shape.color,
+                num_particles=15
+            )
+            self.shapes.remove(shape)
     
     def update(self):
-        """Update all shapes."""
+        """Update all shapes and particles."""
         for shape in self.shapes:
             shape.update()
             
@@ -75,18 +118,34 @@ class ShapeManager:
             if shape.y <= 0 or shape.y >= self.screen_height:
                 shape.velocity_y *= -1
         
+        # Update particle system
+        self.particle_system.update()
+        
         # Clean up old shapes
         self.cleanup_old_shapes()
     
     def draw(self, screen):
-        """Draw all shapes."""
+        """Draw all shapes and particles."""
+        # Draw shapes first
         for shape in self.shapes:
             shape.draw(screen)
+        
+        # Draw particles on top
+        self.particle_system.draw(screen)
     
     def clear_all(self):
-        """Clear all shapes."""
+        """Clear all shapes and particles."""
         self.shapes.clear()
+        self.particle_system.clear_all()
     
     def get_shape_count(self):
         """Get the current number of shapes."""
         return len(self.shapes)
+    
+    def get_particle_count(self):
+        """Get the current number of particles."""
+        return self.particle_system.get_particle_count()
+    
+    def cleanup(self):
+        """Clean up resources."""
+        self.sound_manager.cleanup()

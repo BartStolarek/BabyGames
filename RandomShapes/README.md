@@ -9,6 +9,7 @@ An interactive keyboard game designed for babies who love to press keys and watc
 - **Rich color palette** - Different key types produce different color families
 - **Smooth animations** - Shapes move, rotate, and scale dynamically
 - **Particle effects** - Special effects for fireworks, sparkles, and explosions
+- **Shape limit with popping animation** - Maximum 10 shapes with beautiful popping effects when oldest shape is removed
 - **Safe exit** - Press `Ctrl+Shift+C` to exit the game safely
 
 ## Key Mappings
@@ -65,8 +66,9 @@ The game is built with a modular architecture for easy maintenance:
 - **`display.py`** - Full-screen display management
 - **`input_handler.py`** - Keyboard input processing and key mappings
 - **`shapes.py`** - Shape definitions and drawing methods
-- **`shape_manager.py`** - Shape lifecycle and management
+- **`shape_manager.py`** - Shape lifecycle and management with 10-shape limit
 - **`animation_manager.py`** - Animation and particle effects
+- **`particle_system.py`** - Popping animation particle system
 
 ## Technical Details
 
@@ -78,8 +80,9 @@ The game is built with a modular architecture for easy maintenance:
 
 ## Safety Features
 
-- **Automatic shape cleanup** - Shapes disappear after 10 seconds
-- **Performance limits** - Maximum 50 shapes on screen at once
+- **Shape limit** - Maximum 10 shapes on screen at once with automatic removal of oldest shape
+- **Popping animation** - Beautiful particle effects when shapes are removed
+- **Automatic shape cleanup** - Shapes disappear after 10 seconds with popping animation
 - **Safe exit combination** - `Ctrl+Shift+C` to exit without force-quitting
 - **Edge bouncing** - Shapes bounce off screen edges instead of disappearing
 
@@ -91,11 +94,14 @@ You can easily customize the game by modifying:
 - **Shapes**: Add new shape types in `shapes.py`
 - **Effects**: Modify particle effects in `animation_manager.py`
 - **Key mappings**: Change which keys create which shapes in `input_handler.py`
+- **Shape limit**: Adjust the maximum number of shapes in `shape_manager.py` (default: 10)
+- **Popping animation**: Customize particle effects in `particle_system.py`
 
 ## Troubleshooting
 
 - **Game won't start**: Make sure pygame is installed and you're in the virtual environment
 - **Full-screen issues**: Try running with `python main.py` from terminal
-- **Performance issues**: The game automatically limits shapes, but you can reduce `max_shapes` in `shape_manager.py`
+- **Performance issues**: The game automatically limits shapes to 10, but you can reduce `max_shapes` in `shape_manager.py`
+- **Test shape limit**: Run `python test_shape_limit.py` to test the shape limit and popping animation
 
 Enjoy watching your baby discover the magic of interactive computing! 🎉

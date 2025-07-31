@@ -32,23 +32,44 @@ class BabyGame:
         """Main game loop."""
         print("🎮 Baby Games started! Press any key to create shapes!")
         print("💡 Press Ctrl+Shift+C to exit the game")
+        print("🖱️  Mouse buttons create special effects:")
+        print("   Left click: Rainbow trail")
+        print("   Middle click: Expanding circles")
+        print("   Right click: Star burst")
+        print("   Side button 1: Spiral effect")
+        print("   Side button 2: Fireworks")
+        print("   Side button 3: Butterfly swarm")
+        print("   Side button 4: Cosmic portal")
+        
+        last_time = pygame.time.get_ticks()
         
         try:
             while self.running:
+                current_time = pygame.time.get_ticks()
+                dt = current_time - last_time
+                last_time = current_time
+                
+                # Get current mouse position
+                mouse_pos = pygame.mouse.get_pos()
+                
                 # Handle events
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         self.running = False
                     elif event.type == pygame.KEYDOWN:
                         self.handle_key_press(event)
+                    elif event.type == pygame.MOUSEBUTTONDOWN:
+                        self.handle_mouse_click(event)
                 
                 # Update animations and shapes
                 self.animation_manager.update()
                 self.shape_manager.update()
+                self.shape_manager.update_mouse_tail(mouse_pos, dt)
                 
                 # Render everything
                 self.display.clear()
                 self.shape_manager.draw(self.display.screen)
+                self.shape_manager.draw_mouse_tail(self.display.screen)
                 self.animation_manager.draw_particles(self.display.screen)
                 self.display.update()
                 
@@ -76,6 +97,18 @@ class BabyGame:
         if shape:
             self.animation_manager.add_shape(shape)
             print(f"✨ Created {shape.shape_type} with color {shape.color_name}!")
+    
+    def handle_mouse_click(self, event):
+        """Handle mouse button clicks and create special effects."""
+        button = event.button
+        mouse_pos = event.pos
+        
+        # Get action description
+        action_desc = self.input_handler.get_mouse_action_description(button)
+        print(f"🖱️  Mouse button {button} pressed at {mouse_pos}: {action_desc}")
+        
+        # Handle the mouse action
+        self.shape_manager.handle_mouse_action(button, mouse_pos)
 
 
 def main():

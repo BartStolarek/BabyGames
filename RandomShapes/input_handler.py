@@ -1,6 +1,6 @@
 """
 Input Handler module for Baby Games
-Manages keyboard input processing and key mapping.
+Manages keyboard and mouse input processing and key mapping.
 """
 
 import pygame
@@ -9,6 +9,17 @@ import pygame
 class InputHandler:
     def __init__(self):
         """Initialize the input handler."""
+        # Mouse button mappings for creative actions
+        self.mouse_button_actions = {
+            1: "rainbow_trail",      # Left click - Creates rainbow trail effect
+            2: "middle_click",       # Middle click - Creates expanding circles
+            3: "right_click",        # Right click - Creates star burst
+            4: "side_button_1",      # Side button 1 - Creates spiral effect
+            5: "side_button_2",      # Side button 2 - Creates fireworks
+            6: "side_button_3",      # Side button 3 - Creates butterfly swarm
+            7: "side_button_4",      # Side button 4 - Creates cosmic portal
+        }
+        
         self.key_mappings = {
             # Letter keys
             pygame.K_a: "circle",
@@ -93,3 +104,22 @@ class InputHandler:
         """Get available colors for a given key."""
         category = self.get_color_category(key)
         return self.color_mappings.get(category, self.color_mappings["letters"])
+    
+    def get_mouse_action(self, button):
+        """Get the action for a mouse button."""
+        return self.mouse_button_actions.get(button, "unknown")
+    
+    def get_mouse_action_description(self, button):
+        """Get a description of what a mouse button does."""
+        action = self.get_mouse_action(button)
+        descriptions = {
+            "rainbow_trail": "Creates a beautiful rainbow trail effect",
+            "middle_click": "Creates expanding circles from mouse position",
+            "right_click": "Creates a star burst explosion",
+            "side_button_1": "Creates a spiral effect around the mouse",
+            "side_button_2": "Creates fireworks at mouse position",
+            "side_button_3": "Creates a beautiful butterfly swarm",
+            "side_button_4": "Creates a cosmic portal effect",
+            "unknown": "Unknown action"
+        }
+        return descriptions.get(action, "Unknown action")
